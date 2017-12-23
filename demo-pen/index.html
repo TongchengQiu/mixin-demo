@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8' />
+<title>贝塞尔曲线可视化操作</title>
+<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	.wrap {
+		width: 800px;
+		height: 500px;
+		margin: 20px auto;
+	}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+	<canvas id="canvas_field" width='800' height='500'  style='position:relative;border:1px solid #ccc;'>
+		用现代化浏览器
+	</canvas>
+</div>
+
+<script type="text/javascript">
+
+var $id=function(n){
+	return document.getElementById(n) || n;
+}
+
+$id("canvas_field").addEventListener("mousedown", main, false);
+
+var ctx = $id("canvas_field").getContext('2d');
+
+var vector={
+	sta: [],
+	end: [],
+	mid: [],
+	cr1: [],
+	cr2: []
+};
+
+function main(e){
+	var cx = e.layerX || e.offsetX,
+			cy = e.layerY || e.offsetY;
+
+	drawPoint(cx,cy);
+
+	var sx = +vector.sta[0],
+			sy = +vector.sta[1],
+			mx = +vector.mid[0],
+			my = +vector.mid[1],
+			ex = +vector.end[0],
+			ey = +vector.end[1],
+			cr1x = +vector.cr1[0],
+			cr1y = +vector.cr1[1],
+			cr2x = +vector.cr2[0],
+			cr2y = +vector.cr2[1];
+
+	if(vector.end[0] === undefined) {
+		return false;
+	}
+
+	document.onmouseup = function() {
+		document.onmousemove = null;
+	}
+
+	if(cr1x - 5 < cx && cx < cr1x + 5 && cr1y - 5 < cy && cy < cr1y + 5) {
+		return discern('cr1', cx, cy, cr1x, cr1y, cr2x, cr2y);
+	}
+	if(cr2x - 5 < cx && cx < cr2x + 5 && cr2y - 5 < cy && cy < cr2y + 5) {
+		return discern('cr2', cx, cy, cr1x, cr1y, cr2x, cr2y);
+	}
+	if(sx - 5 < cx && cx < sx + 5 && sy - 5 < cy && cy < sy + 5) {
+		return discern('start', cx, cy, cr1x, cr1y, cr2x, cr2y);
+	}
+	if(mx - 5 < cx && cx < mx + 5 && my - 5 < cy && cy < my + 5) {
+		return discern('mid', cx, cy, cr1x, cr1y, cr2x, cr2y);
+	}
+	if(ex - 5 < cx && cx < ex + 5 && ey - 5 < cy && cy < ey + 5) {
+		return discern('end', cx, cy, cr1x, cr1y, cr2x, cr2y);
+	}
+}
+
+function drawPoint(cx, cy) {
+	if(!vector.sta.length) {
+		vector.sta = [cx, cy];
+		drawCircle(cx, cy);
+		return true;
+	}
+	if(!vector.mid.length) {
+		vector.mid = vector.cr1 = vector.cr2 = [cx, cy];
+		drawCircle(cx, cy);
+		draw();
+		return true;
+	}
+	if (!vector.end.length) {
+		vector.end = [cx, cy];
+		drawCircle(cx, cy);
+		draw();
+		return true;
+	}
+}
+
+function draw() {
+	ctx.strokeStyle = '#333';
+	ctx.lineWidth = 2;
+	// clear all
+	ctx.clearRect(0,0,800,500);
+
+	//bezier line one
+	if (vector.mid.length) {
+		ctx.beginPath();
+	  ctx.moveTo(vector.sta[0], vector.sta[1]);
+		ctx.bezierCurveTo(vector.sta[0], vector.sta[1], vector.cr1[0], vector.cr1[1], vector.mid[0], vector.mid[1]);
+		ctx.stroke();
+	}
+
+	//bezier line next
+	if (vector.end.length) {
+		ctx.beginPath();
+	  ctx.moveTo(vector.mid[0], vector.mid[1]);
+		ctx.bezierCurveTo(vector.cr2[0], vector.cr2[1], vector.end[0], vector.end[1], vector.end[0], vector.end[1]);
+		ctx.stroke();
+	}
+
+	ctx.lineWidth = 0.5;
+	// ctxtrol line one
+	ctx.beginPath();
+	ctx.moveTo(vector.mid[0],vector.mid[1]);
+	ctx.lineTo(vector.cr1[0], vector.cr1[1]);
+	ctx.stroke();
+
+	// ctxtrol line next
+	ctx.beginPath();
+	ctx.moveTo(vector.mid[0], vector.mid[1]);
+	ctx.lineTo(vector.cr2[0], vector.cr2[1]);
+	ctx.stroke();
+
+	// 5 ctxtrol point
+	ctx.strokeRect(vector.cr1[0] - 2, vector.cr1[1] - 2, 4, 4);
+	ctx.strokeRect(vector.cr2[0] - 2, vector.cr2[1] - 2, 4, 4);
+	drawCircle(vector.sta[0], vector.sta[1]);
+	drawCircle(vector.mid[0], vector.mid[1]);
+	drawCircle(vector.end[0], vector.end[1]);
+}
+
+function discern(v, cx, cy, cr1x, cr1y, cr2x, cr2y) {
+	document.onmousemove = function(e) {
+		var dx = e.layerX || e.offsetX,
+			  dy = e.layerY || e.offsetY;
+		switch(v) {
+			case 'start':
+				vector.sta = [dx, dy];
+				break;
+			case 'end':
+				vector.end = [dx, dy];
+				break;
+			case 'mid':
+				vector.mid = [dx, dy];
+				vector.cr1 = [(cr1x + (dx - cx)), (cr1y + (dy - cy))];
+				vector.cr2 = [(cr2x + (dx - cx)), (cr2y + (dy - cy))];
+				break;
+			case 'cr1':
+				vector.cr1 = [dx, dy];
+				vector.cr2 = [(cr2x - (dx - cx)), (cr2y - (dy - cy))];
+				break;
+			case 'cr2':
+				vector.cr2 = [dx, dy];
+				vector.cr1 = [(cr1x - (dx - cx)), (cr1y - (dy - cy))];
+				break;
+			default: break;
+		}
+		draw();
+	};
+}
+
+function drawCircle(x, y) {
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = '#333';
+	ctx.fillStyle = "#fff";
+	ctx.beginPath();
+	ctx.arc(x, y, 3, 0, (2 * Math.PI));
+	ctx.stroke();
+	ctx.fill();
+}
+</script>
+</body>
+</html>

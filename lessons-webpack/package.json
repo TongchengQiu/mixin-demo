@@ -1,0 +1,32 @@
+{
+  "name": "webpack-lessons",
+  "version": "1.0.0",
+  "description": "lessons of how to use webpack",
+  "main": "index.js",
+  "scripts": {
+    "test": "no"
+  },
+  "repository": {
+    "type": "git",
+    "url": "n"
+  },
+  "keywords": [
+    "webpack"
+  ],
+  "author": "qiutc",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer-loader": "^3.2.0",
+    "babel-core": "^6.20.0",
+    "babel-loader": "^6.2.10",
+    "css-loader": "^0.26.1",
+    "eslint-loader": "^1.6.1",
+    "file-loader": "^0.9.0",
+    "html-loader": "^0.4.4",
+    "json-loader": "^0.5.4",
+    "node-sass": "^4.0.0",
+    "sass-loader": "^4.1.0",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7"
+  }
+}
