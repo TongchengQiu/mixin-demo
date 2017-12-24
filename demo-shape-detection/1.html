@@ -25,8 +25,7 @@
 <div id="container">
   <img
     id="face-image"
-    src="./img-1.jpeg" alt="image"
-    crossorigin="anonymous"
+    alt="image"
     style="width: 100%;"
   />
 </div>
@@ -40,24 +39,30 @@ function main () {
   const container = document.getElementById('container');
   const rate = image.offsetWidth / image.naturalWidth;
 
-  faceDetector.detect(image)
-    .then(detectedFaces => {
-      console.log(detectedFaces);
-      for (const face of detectedFaces) {
-        const bound = document.createElement('div');
-        bound.style.position = 'absolute';
-        bound.style.left = rate * face.boundingBox.x + 'px';
-        bound.style.top = rate * face.boundingBox.y + 'px';
-        bound.style.width = rate * face.boundingBox.width + 'px';
-        bound.style.height = rate * face.boundingBox.height + 'px';
-        bound.style.border = '2px solid red';
-        bound.style.backgroundColor = 'rgba(0, 0, 255, 0.25)';
-        container.appendChild(bound);
-      }
-    })
-    .catch((e) => {
-      console.error("Face Detection failed, boo.", e);
-    });
+  image.src = './img-1.jpeg'
+
+  image.onload = handleDetect
+
+  function handleDetect () {
+    faceDetector.detect(image)
+      .then(detectedFaces => {
+        console.log(detectedFaces);
+        for (const face of detectedFaces) {
+          const bound = document.createElement('div');
+          bound.style.position = 'absolute';
+          bound.style.left = rate * face.boundingBox.x + 'px';
+          bound.style.top = rate * face.boundingBox.y + 'px';
+          bound.style.width = rate * face.boundingBox.width + 'px';
+          bound.style.height = rate * face.boundingBox.height + 'px';
+          bound.style.border = '2px solid red';
+          bound.style.backgroundColor = 'rgba(0, 0, 255, 0.25)';
+          container.appendChild(bound);
+        }
+      })
+      .catch((e) => {
+        console.error("Face Detection failed, boo.", e);
+      });
+  }
 }
 </script>
 </body>
