@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Shape Detection API Demo</title>
+  <style>
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  #container {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <img
+    id="text-image"
+    alt="image"
+    style="width: 100%;"
+  />
+</div>
+
+<script type="text/javascript">
+window.onload = main();
+function main () {
+  const textDetector = new TextDetector();
+
+  const image = document.getElementById('text-image');
+  const container = document.getElementById('container');
+
+  image.src = './img-3.png'
+
+  image.onload = function () {
+    setTimeout(handleDetect, 100);
+  };
+
+  function handleDetect () {
+    const rate = image.offsetWidth / image.naturalWidth;
+    textDetector.detect(image)
+      .then(detectedText => {
+        console.log(detectedText);
+        for (const text of detectedText) {
+          const bound = document.createElement('div');
+          bound.style.position = 'absolute';
+          bound.style.left = rate * text.boundingBox.x + 'px';
+          bound.style.top = rate * text.boundingBox.y + 'px';
+          bound.style.width = rate * text.boundingBox.width + 'px';
+          bound.style.height = rate * text.boundingBox.height + 'px';
+          bound.style.border = '2px solid red';
+          bound.style.backgroundColor = 'rgba(0, 0, 255, 0.25)';
+          container.appendChild(bound);
+        }
+      })
+      .catch((e) => {
+        console.error("Text Detection failed, boo.", e);
+      });
+  }
+}
+</script>
+</body>
+</html>
