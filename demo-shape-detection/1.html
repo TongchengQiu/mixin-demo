@@ -37,18 +37,21 @@ function main () {
 
   const image = document.getElementById('face-image');
   const container = document.getElementById('container');
-  const rate = image.offsetWidth / image.naturalWidth;
 
   image.src = './img-1.jpeg'
 
-  image.onload = handleDetect
+  image.onload = function () {
+    setTimeout(handleDetect, 100);
+  };
 
   function handleDetect () {
+    const rate = image.offsetWidth / image.naturalWidth;
     faceDetector.detect(image)
       .then(detectedFaces => {
         console.log(detectedFaces);
         for (const face of detectedFaces) {
           const bound = document.createElement('div');
+          console.log(face.boundingBox);
           bound.style.position = 'absolute';
           bound.style.left = rate * face.boundingBox.x + 'px';
           bound.style.top = rate * face.boundingBox.y + 'px';
