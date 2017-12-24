@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Shape Detection API Demo</title>
+  <style>
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  </style>
+</head>
+<body>
+
+<img id="qrcode-image" src="" alt="QRCODE">
+
+<script type="text/javascript">
+window.onload = main;
+
+function main () {
+  const barcodeDetector = new BarcodeDetector();
+
+  const image = document.getElementById('qrcode-image');
+
+  image.src = './img-2.png'
+
+  image.onload = function () {
+    setTimeout(handleDetect, 100);
+  };
+
+  function handleDetect () {
+    barcodeDetector.detect(image)
+      .then(detectedBarcode => {
+        console.log(detectedBarcode);
+        for (const barcode of detectedBarcode) {
+          const bound = document.createElement('div');
+          bound.style.position = 'absolute';
+          bound.style.left = barcode.boundingBox.x + 'px';
+          bound.style.top = barcode.boundingBox.y + 'px';
+          bound.style.width = barcode.boundingBox.width + 'px';
+          bound.style.height = barcode.boundingBox.height + 'px';
+          bound.style.border = '2px solid red';
+          bound.style.backgroundColor = 'rgba(0, 0, 255, 0.25)';
+          document.body.appendChild(bound);
+
+          const value = document.createElement('div');
+          value.style.color = 'rgba(0, 0, 255, 0.9)';
+          value.style.fontSize = '20px';
+          value.innerText = barcode.rawValue;
+          document.body.appendChild(value);
+        }
+      })
+      .catch((e) => {
+        console.error("Face Detection failed, boo.", e);
+      });
+  }
+}
+</script>
+</body>
+</html>
